@@ -1,0 +1,289 @@
+<!-- livebook:{"file_entries":[{"file":{"file_system_id":"local","file_system_type":"local","path":"/Users/gambhirsharma/coding/learn-elixir/FCC-elixir/notebooks/03_flow_control.livemd"},"name":"03_flow_control.livemd","type":"file"}]} -->
+
+# Learn elixir
+
+## Data Type
+
+### Cool Tricks:
+
+* `i()` :  In IEx (Interactive Elixir), the i/1 helper function is used to inspect the details of a given value.
+* `h()` : The h/1 helper provides documentation about modules and functions.
+* `t()` : The t/1 function shows types defined in a module.
+
+## Atom
+
+```elixir
+# this is atom
+:ok
+{:ok, mess} = {:ok, "Status code 200"}
+mess
+```
+
+## String
+
+Elixir strings are UTF-8 encoded binaries <br>
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+is_binary("gambhir") # true
+```
+
+and to find the code, binary representation of a we can use `?` in iex
+
+```
+iex> ?a 
+97
+
+iex> ?b
+98
+
+```
+
+Use the `i()` operator in `iex` to get details about the data type.
+
+<!-- livebook:{"break_markdown":true} -->
+
+```bash
+iex(1)> i("gambhir")
+Term
+  "gambhir"
+Data type
+  BitString
+Byte size
+  7
+Description
+  This is a string: a UTF-8 encoded binary. It's printed surrounded by
+  "double quotes" because all UTF-8 encoded code points in it are printable.
+Raw representation
+  <<103, 97, 109, 98, 104, 105, 114>>
+Reference modules
+  String, :binary
+Implemented protocols
+  Collectable, IEx.Info, Inspect, List.Chars, String.Chars
+iex(2)>
+```
+
+```elixir
+# this <> is `binary concatenation operator`
+"G" <> rest = "Gambhir"
+IO.puts(rest)
+
+mess = "Hello " <> "World!!"
+IO.puts(mess)
+
+"Hello " <> word = mess
+IO.puts(word)
+```
+
+```elixir
+name = "Gambhir"
+
+# instead of giving back the char it give back it's binary representation
+<<head, rest::binary>> = name
+# 71
+IO.puts(head)
+# true
+head == ?G
+
+<<"Ga", rest::binary>> = name
+IO.puts(rest)
+
+# writing down the word in binary inside `<<>>` operator
+hello = <<"Hello"::binary>>
+
+# takes the only first two binary 
+<<head::binary-size(2), rest::binary>> = name
+IO.puts(head)
+```
+
+`::` in elixir is called **type specification operator** (also known as the **binary modifier**) and is primarily used in pattern matching with binaries and bitstrings.
+
+## Charlist
+
+charlists in Elixir are **lists of character codes** (integers representing ASCII/UTF-8 values). Unlike strings ("text"), which are UTF-8 encoded binaries, charlists ('text') are just lists of integers.
+
+```iex
+iex(3)> i('Gambhir')
+Term
+  ~c"Gambhir"
+Data type
+  List
+Description
+  This is a list of integers that is printed using the `~c` sigil syntax,
+  defined by the `Kernel.sigil_c/2` macro, because all the integers in it
+  represent printable ASCII characters. Conventionally, a list of Unicode
+  code points is known as a charlist and a list of ASCII characters is a
+  subset of it.
+Raw representation
+  [71, 97, 109, 98, 104, 105, 114]
+Reference modules
+  List
+Implemented protocols
+  Collectable, Enumerable, IEx.Info, Inspect, List.Chars, String.Chars
+iex(4)>
+
+```
+
+```elixir
+name = ~c"Gambhir"
+# true
+is_list(name)
+# false
+is_binary(name)
+
+# we use `++` in charlist to add two string. 
+~c"Hello " ++ name
+```
+
+## Process
+
+**Actor:**
+
+* Run is Processess
+* Identified by PID(Process ID)
+* Inter-communication by Message  passing
+* Each process has it own Stack & Heap allocation
+
+```elixir
+# process id at which livebook is running.
+my_pid = self()
+my_pid
+```
+
+## Lists
+
+List are not Lists/Array - they are Linked List in elixir.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+list = ["a", "b", "c"]
+list[0] # this give error 
+```
+
+We have Linked List because they are recursive in nature. <br/>
+Array or regular List need to save continuously in memory. <br/><br/>
+In elixir we use `recusive function` or in-build module `Enum`
+
+```elixir
+# Enum
+
+list = ["a", "b", "c"]
+# "a"
+Enum.at(list, 0)
+```
+
+**Function Arity:** In Elixir, **arity** refers to the number of arguments a function takes.
+
+<!-- livebook:{"force_markdown":true} -->
+
+```elixir
+Enum.at/2 # this has two arity
+```
+
+```elixir
+[first, second, third] = list
+# a 
+IO.puts(first)
+
+[_, _, third] = ["X", "Y", "Z"]
+# Z
+IO.puts(third)
+
+# a 
+hd(list)
+# ["b", "c"]
+tl(list)
+
+# shot-cut way of doing it using pattern matching
+[h | t] = list
+
+# a 
+h
+# ["b", "c"]
+t
+```
+
+In Elixir, lists are built using the **cons operator** `|`, which joins an element (head) with a list (tail).
+
+## Tuple
+
+A **tuple** is a fixed-size collection of elements. All the elements are stored in contiguous memory locations.
+
+It's good to store small amount of elements. But if you want to store a large amount of elments then use List instead of Tuple.
+
+```elixir
+{a, b} = {1, 2}
+# a # 1
+
+{:reply, msg, state} = {:reply, "Page Found!!", ["Gambhir", "Leunix", "Sagar"]}
+# ["Gambhir", "Leunix", "Sagar"]
+state
+```
+
+## Keyword List
+
+```elixir
+data = [a: 1, b: 2]
+# 1 
+data[:a]
+```
+
+```elixir
+[{:a, 1}] = [a: 1]
+```
+
+## Maps
+
+Elixir Maps are similar to dictionaries in Python </br>
+More features then: Tuple & Keyword-list
+
+```elixir
+my_map = %{a: 1, b: 2, c: 3}
+
+%{a: first, b: second, c: third} = my_map
+# 1
+IO.puts(first)
+
+# can make a shorted map to PM(pattern matching)
+%{b: second} = my_map
+# 2
+IO.puts(second)
+
+# 1
+my_map.a
+```
+
+```elixir
+map2 = %{"a" => 1, "b" => 2, "c" => 3}
+
+%{"c" => c} = map2
+
+# %{"a" => 1, "b" => 2, "c" => 4}
+map2 = %{map2 | "c" => 4}
+
+# %{c: 4, a: 1, b: 2}
+my_map = %{my_map | c: 4}
+```
+
+## Struct
+
+```elixir
+defmodule User do
+  defstruct username: "", email: "", age: nil
+end
+```
+
+```elixir
+user1 = %User{username: "Gambhir", email: "gambhir@email.com"}
+
+%{username: username} = user1
+# Gambhir
+IO.puts(username)
+
+user1 = %{user1 | age: 21}
+# %User{username: "Gambhir", email: "gambhir@email.com", age: 21}
+```
+
+<!-- livebook:{"offset":5676,"stamp":{"token":"XCP.4NIDrtM5XJiLf8PBtes19NFeh9CO0eH5ZzLMgzVZX8_Bak_5OgkPI1K2TubrFNJJ2JGZOFMwY8FsEZmKqpUD231lZqV0Ei6I0IpBag","version":2}} -->
